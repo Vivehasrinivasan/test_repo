@@ -1,0 +1,76 @@
+rules:
+- id: fixora-wrapper-execute-background-task
+  pattern: "def execute_background_task(...):\n  ..."
+  message: 'Vulnerable function ''execute_background_task()'' wraps shlex.split, subprocess.run.
+    Vulnerability: Command Injection. Although shlex.split is used, the command string
+    is still user-controlled, posing a theoretical risk.'
+  severity: INFO
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Command Injection
+    confidence: LOW
+    wrapper_defined_in: core/system.py
+    wraps:
+    - shlex.split
+    - subprocess.run
+    modules_used:
+    - subprocess
+    - shlex
+    cwe:
+    - CWE-78
+    owasp:
+    - A03:2021
+- id: fixora-wrapper-upload-file
+  pattern: "def upload_file(...):\n  ..."
+  message: 'Vulnerable function ''upload_file()'' wraps os.path.join, open. Vulnerability:
+    Path Traversal. The filename is user-controlled, but os.path.join is used, reducing
+    the risk.'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Path Traversal
+    confidence: MEDIUM
+    wrapper_defined_in: api/files.py
+    wraps:
+    - os.path.join
+    - open
+    modules_used:
+    - os
+    cwe: &id001
+    - CWE-22
+    owasp: &id002
+    - A01:2021
+- id: fixora-wrapper-cleanup-old-files
+  pattern: "def cleanup_old_files(...):\n  ..."
+  message: 'Vulnerable function ''cleanup_old_files()'' wraps os.listdir, os.remove,
+    os.path.join. Vulnerability: Path Traversal. The filename is not user-controlled,
+    but the directory path is hardcoded, posing a partial risk.'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Path Traversal
+    confidence: MEDIUM
+    wrapper_defined_in: api/files.py
+    wraps:
+    - os.listdir
+    - os.remove
+    - os.path.join
+    modules_used:
+    - os
+    cwe: *id001
+    owasp: *id002
