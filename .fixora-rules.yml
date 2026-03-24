@@ -1,0 +1,352 @@
+rules:
+- id: fixora-wrapper-load-cached-report
+  pattern: "def load_cached_report(...):\n  ..."
+  message: 'Vulnerable function ''load_cached_report()'' wraps base64.b64decode, json.loads,
+    data.decode. Vulnerability: IDOR / Broken Access Control. No authentication checks
+    are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: services/reports.py
+    wraps:
+    - base64.b64decode
+    - json.loads
+    - data.decode
+    modules_used:
+    - json
+    - base64
+- id: fixora-wrapper-generate-pdf-report
+  pattern: "def generate_pdf_report(...):\n  ..."
+  message: 'Vulnerable function ''generate_pdf_report()'' wraps canvas.Canvas, c.drawString,
+    c.save. Vulnerability: IDOR / Broken Access Control. No authentication checks
+    are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: services/reports.py
+    wraps:
+    - canvas.Canvas
+    - c.drawString
+    - c.save
+    modules_used:
+    - reportlab
+- id: fixora-wrapper-log-user-action
+  pattern: "def log_user_action(...):\n  ..."
+  message: 'Vulnerable function ''log_user_action()'' wraps json.dumps. Vulnerability:
+    IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: utils/logger.py
+    wraps:
+    - json.dumps
+    modules_used:
+    - json
+- id: fixora-wrapper-parse-invoice
+  pattern: "def parse_invoice(...):\n  ..."
+  message: 'Vulnerable function ''parse_invoice()'' wraps etree.XMLParser, etree.fromstring,
+    root.find. Vulnerability: IDOR / Broken Access Control. No authentication checks
+    are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: utils/xml_parser.py
+    wraps:
+    - etree.XMLParser
+    - etree.fromstring
+    - root.find
+    modules_used:
+    - lxml
+- id: fixora-wrapper-xml-to-json
+  pattern: "def xml_to_json(...):\n  ..."
+  message: 'Vulnerable function ''xml_to_json()'' wraps etree.fromstring. Vulnerability:
+    IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: utils/xml_parser.py
+    wraps:
+    - etree.fromstring
+    modules_used:
+    - lxml
+- id: fixora-wrapper-upload-file
+  pattern: "def upload_file(...):\n  ..."
+  message: 'Vulnerable function ''upload_file()'' wraps File, os.path.join, open.
+    Vulnerability: IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: api/files.py
+    wraps:
+    - File
+    - os.path.join
+    - open
+    modules_used:
+    - builtins
+    - os
+    - fastapi
+- id: fixora-wrapper-convert-image
+  pattern: "def convert_image(...):\n  ..."
+  message: 'Vulnerable function ''convert_image()'' wraps re.match. Vulnerability:
+    IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: api/files.py
+    wraps:
+    - re.match
+    modules_used:
+    - re
+- id: fixora-wrapper-cleanup-old-files
+  pattern: "def cleanup_old_files(...):\n  ..."
+  message: 'Vulnerable function ''cleanup_old_files()'' wraps os.listdir, os.remove,
+    os.path.join. Vulnerability: IDOR / Broken Access Control. No authentication checks
+    are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: api/files.py
+    wraps:
+    - os.listdir
+    - os.remove
+    - os.path.join
+    modules_used:
+    - os
+- id: fixora-wrapper-get-legacy-stats
+  pattern: "def get_legacy_stats(...):\n  ..."
+  message: 'Vulnerable function ''get_legacy_stats()'' wraps sqlite3.connect, conn.cursor,
+    cursor.execute, cursor.fetchall, conn.close. Vulnerability: IDOR / Broken Access
+    Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: api/legacy.py
+    wraps:
+    - sqlite3.connect
+    - conn.cursor
+    - cursor.execute
+    - cursor.fetchall
+    - conn.close
+    modules_used:
+    - sqlite3
+- id: fixora-wrapper-hash-password
+  pattern: "def hash_password(...):\n  ..."
+  message: 'Vulnerable function ''hash_password()'' wraps bcrypt.hashpw, bcrypt.gensalt.
+    Vulnerability: IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: api/auth.py
+    wraps:
+    - bcrypt.hashpw
+    - bcrypt.gensalt
+    modules_used:
+    - bcrypt
+- id: fixora-wrapper-verify-password
+  pattern: "def verify_password(...):\n  ..."
+  message: 'Vulnerable function ''verify_password()'' wraps bcrypt.checkpw. Vulnerability:
+    IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: api/auth.py
+    wraps:
+    - bcrypt.checkpw
+    modules_used:
+    - bcrypt
+- id: fixora-wrapper-init
+  pattern: "def __init__(...):\n  ..."
+  message: 'Vulnerable function ''__init__()'' wraps logging.getLogger. Vulnerability:
+    IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: core/database.py
+    wraps:
+    - logging.getLogger
+    modules_used:
+    - logging
+- id: fixora-wrapper-get-connection
+  pattern: "def _get_connection(...):\n  ..."
+  message: 'Vulnerable function ''_get_connection()'' wraps sqlite3.connect, conn.execute.
+    Vulnerability: IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: core/database.py
+    wraps:
+    - sqlite3.connect
+    - conn.execute
+    modules_used:
+    - sqlite3
+- id: fixora-wrapper-run-query-v2
+  pattern: "def run_query_v2(...):\n  ..."
+  message: 'Vulnerable function ''run_query_v2()'' wraps cursor.execute. Vulnerability:
+    IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: core/database.py
+    wraps:
+    - cursor.execute
+    modules_used:
+    - <object>.execute
+- id: fixora-wrapper-bulk-insert
+  pattern: "def bulk_insert(...):\n  ..."
+  message: 'Vulnerable function ''bulk_insert()'' wraps cursor.execute. Vulnerability:
+    IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: core/database.py
+    wraps:
+    - cursor.execute
+    modules_used:
+    - <object>.execute
+- id: fixora-wrapper-run-async-task
+  pattern: "def run_async_task(...):\n  ..."
+  message: 'Vulnerable function ''run_async_task()'' wraps asyncio.get_event_loop,
+    loop.run_in_executor. Vulnerability: IDOR / Broken Access Control. No authentication
+    checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: core/system.py
+    wraps:
+    - asyncio.get_event_loop
+    - loop.run_in_executor
+    modules_used:
+    - asyncio
+- id: fixora-wrapper-execute-background-task
+  pattern: "def execute_background_task(...):\n  ..."
+  message: 'Vulnerable function ''execute_background_task()'' wraps shlex.split, subprocess.run.
+    Vulnerability: IDOR / Broken Access Control. No authentication checks are performed'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: IDOR / Broken Access Control
+    confidence: MEDIUM
+    wrapper_defined_in: core/system.py
+    wraps:
+    - shlex.split
+    - subprocess.run
+    modules_used:
+    - subprocess
+    - shlex
