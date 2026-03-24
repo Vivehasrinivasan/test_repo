@@ -1,0 +1,100 @@
+rules:
+- id: fixora-wrapper-convert-image
+  pattern: "def convert_image(...):\n  ..."
+  message: '### [ALERT] Command Injection in `convert_image()`
+
+
+    **Mechanism:**
+
+    This function takes untrusted input and passes it directly into `subprocess.run`
+    without adequate validation or sanitization.
+
+
+    **Example Exploit:**
+
+    ```python
+
+    // An attacker passes a malicious payload into the wrapper:
+
+    convert_image(malicious_payload)
+
+    ```
+
+
+    **Data at Risk (Impact):**
+
+    Allows an attacker to execute arbitrary OS commands, leading to full server compromise.
+
+
+    **AI Analysis:**
+
+    Although the filename is sanitized, the command is still constructed using string
+    formatting which could lead to command injection if the format is not properly
+    validated.'
+  severity: ERROR
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Command Injection
+    confidence: HIGH
+    wrapper_defined_in: api/files.py
+    wraps:
+    - subprocess.run
+    modules_used:
+    - subprocess
+    cwe: &id001
+    - CWE-78
+    owasp: &id002
+    - A03:2021
+- id: fixora-wrapper-execute-background-task
+  pattern: "def execute_background_task(...):\n  ..."
+  message: '### [ALERT] Command Injection in `execute_background_task()`
+
+
+    **Mechanism:**
+
+    This function takes untrusted input and passes it directly into `subprocess.run`
+    without adequate validation or sanitization.
+
+
+    **Example Exploit:**
+
+    ```python
+
+    // An attacker passes a malicious payload into the wrapper:
+
+    execute_background_task(malicious_payload)
+
+    ```
+
+
+    **Data at Risk (Impact):**
+
+    Allows an attacker to execute arbitrary OS commands, leading to full server compromise.
+
+
+    **AI Analysis:**
+
+    Although shlex.split is used, the command string is still a potential source of
+    command injection if it is not properly sanitized.'
+  severity: ERROR
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Command Injection
+    confidence: HIGH
+    wrapper_defined_in: core/system.py
+    wraps:
+    - subprocess.run
+    modules_used:
+    - subprocess
+    cwe: *id001
+    owasp: *id002
