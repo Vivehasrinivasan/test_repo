@@ -1,0 +1,148 @@
+rules:
+- id: fixora-wrapper-bulk-insert
+  pattern: "def bulk_insert(...):\n  ..."
+  message: '### Alert: SQL Injection in `bulk_insert()`
+
+
+    **Mechanism:**
+
+    This function takes untrusted input and passes it directly into `cursor.execute`
+    without adequate validation or sanitization.
+
+
+    **Example Attack Vector:**
+
+    ```python\nbulk_insert(''users; DROP TABLE users; --'', data)\n```
+
+
+    **How The Attack Works:**
+
+    The payload closes the intended SQL value and injects a destructive second statement
+    that the sink executes.
+
+
+    **Data at Risk (Impact):**
+
+    Can leak the entire database, bypass authentication, or destroy critical records.
+
+
+    **AI Analysis:**
+
+    User input concatenated directly into SQL query.'
+  severity: ERROR
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: SQL Injection
+    confidence: HIGH
+    wrapper_defined_in: core/database.py
+    wraps:
+    - cursor.execute
+    modules_used:
+    - sqlite3
+    cwe:
+    - CWE-89
+    owasp:
+    - A03:2021
+- id: fixora-wrapper-execute-background-task
+  pattern: "def execute_background_task(...):\n  ..."
+  message: '### Alert: Command Injection in `execute_background_task()`
+
+
+    **Mechanism:**
+
+    This function takes untrusted input and passes it directly into `subprocess.run`
+    without adequate validation or sanitization.
+
+
+    **Example Attack Vector:**
+
+    ```python\nexecute_background_task(''ls -l; rm -rf /; #'')\n```
+
+
+    **How The Attack Works:**
+
+    The payload injects a malicious command that gets executed by the subprocess.
+
+
+    **Data at Risk (Impact):**
+
+    Allows an attacker to execute arbitrary OS commands, leading to full server compromise.
+
+
+    **AI Analysis:**
+
+    User-controlled data passed to subprocess.run without proper sanitization.'
+  severity: ERROR
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Command Injection
+    confidence: HIGH
+    wrapper_defined_in: core/system.py
+    wraps:
+    - subprocess.run
+    modules_used:
+    - subprocess
+    cwe:
+    - CWE-78
+    owasp:
+    - A03:2021
+- id: fixora-wrapper-upload-file
+  pattern: "def upload_file(...):\n  ..."
+  message: '### Alert: Path Traversal in `upload_file()`
+
+
+    **Mechanism:**
+
+    This function takes untrusted input and passes it directly into `os.path.join,
+    open` without adequate validation or sanitization.
+
+
+    **Example Attack Vector:**
+
+    ```python\nupload_file(''../../../../etc/passwd'')\n```
+
+
+    **How The Attack Works:**
+
+    The payload traverses the directory structure and writes to a sensitive file.
+
+
+    **Data at Risk (Impact):**
+
+    Can leak sensitive server files (e.g., /etc/passwd, .env) and application source
+    code.
+
+
+    **AI Analysis:**
+
+    User-controlled filename used in file path without proper sanitization.'
+  severity: ERROR
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Path Traversal
+    confidence: HIGH
+    wrapper_defined_in: api/files.py
+    wraps:
+    - os.path.join
+    - open
+    modules_used:
+    - os
+    cwe:
+    - CWE-22
+    owasp:
+    - A01:2021
