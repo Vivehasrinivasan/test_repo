@@ -1,0 +1,51 @@
+rules:
+- id: fixora-wrapper-execute-background-task
+  pattern: "def execute_background_task(...):\n  ..."
+  message: '### Alert: Command Injection in `execute_background_task()`
+
+
+    **Mechanism:**
+
+    This function takes untrusted input and passes it directly into `shlex.split,
+    subprocess.run` without adequate validation or sanitization.
+
+
+    **Example Attack Vector:**
+
+    ```python\nexecute_background_task(''ls -l; rm -rf /'')\n```
+
+
+    **How The Attack Works:**
+
+    The payload injects a destructive command that the subprocess sink executes.
+
+
+    **Data at Risk (Impact):**
+
+    Allows an attacker to execute arbitrary OS commands, leading to full server compromise.
+
+
+    **AI Analysis:**
+
+    Although shlex.split is used, the command string is still controlled by user input.'
+  severity: INFO
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Command Injection
+    confidence: LOW
+    wrapper_defined_in: core/system.py
+    wraps:
+    - shlex.split
+    - subprocess.run
+    modules_used:
+    - shlex
+    - subprocess
+    cwe:
+    - CWE-78
+    owasp:
+    - A03:2021
