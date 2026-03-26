@@ -1,35 +1,35 @@
 rules:
-- id: fixora-wrapper-bulk-insert
-  pattern: "def bulk_insert(...):\n  ..."
-  message: '### Alert: SQL Injection in `bulk_insert()`
+- id: fixora-wrapper-generate-pdf-report
+  pattern: "def generate_pdf_report(...):\n  ..."
+  message: '### Alert: XSS in `generate_pdf_report()`
 
 
     **Mechanism:**
 
-    This function takes untrusted input and passes it directly into `cursor.execute`
-    without adequate validation or sanitization.
+    This function takes untrusted input and passes it directly into `canvas.Canvas,
+    c.drawString` without adequate validation or sanitization.
 
 
     **Example Attack Vector:**
 
-    ```python\nbulk_insert(''users; DROP TABLE users; --'', data)\n```
+    ```python\n<script>alert(''XSS'')</script>\n```
 
 
     **How The Attack Works:**
 
-    The payload closes the intended SQL value and injects a destructive second statement
-    that the sink executes.
+    The payload is injected into the PDF and executed when the PDF is opened, potentially
+    leading to malicious actions.
 
 
     **Data at Risk (Impact):**
 
-    Can leak the entire database, bypass authentication, or destroy critical records.
+    Can steal user session cookies, hijack accounts, or deface the application.
 
 
     **AI Analysis:**
 
-    User input concatenated directly into SQL query.'
-  severity: ERROR
+    User-controlled data is drawn onto a PDF without proper sanitization.'
+  severity: WARNING
   languages:
   - python
   metadata:
@@ -37,63 +37,16 @@ rules:
     technology:
     - python
     source: fixora-ai-analysis
-    vulnerability_type: SQL Injection
-    confidence: HIGH
-    wrapper_defined_in: core/database.py
+    vulnerability_type: XSS
+    confidence: MEDIUM
+    wrapper_defined_in: services/reports.py
     wraps:
-    - cursor.execute
+    - canvas.Canvas
+    - c.drawString
     modules_used:
-    - sqlite3
+    - reportlab
     cwe:
-    - CWE-89
-    owasp:
-    - A03:2021
-- id: fixora-wrapper-execute-background-task
-  pattern: "def execute_background_task(...):\n  ..."
-  message: '### Alert: Command Injection in `execute_background_task()`
-
-
-    **Mechanism:**
-
-    This function takes untrusted input and passes it directly into `subprocess.run`
-    without adequate validation or sanitization.
-
-
-    **Example Attack Vector:**
-
-    ```python\nexecute_background_task(''ls -l; rm -rf /; #'')\n```
-
-
-    **How The Attack Works:**
-
-    The payload injects a malicious command that the subprocess executes.
-
-
-    **Data at Risk (Impact):**
-
-    Allows an attacker to execute arbitrary OS commands, leading to full server compromise.
-
-
-    **AI Analysis:**
-
-    User-controlled data is passed to a command without proper sanitization.'
-  severity: ERROR
-  languages:
-  - python
-  metadata:
-    category: security
-    technology:
-    - python
-    source: fixora-ai-analysis
-    vulnerability_type: Command Injection
-    confidence: HIGH
-    wrapper_defined_in: core/system.py
-    wraps:
-    - subprocess.run
-    modules_used:
-    - subprocess
-    cwe:
-    - CWE-78
+    - CWE-79
     owasp:
     - A03:2021
 - id: fixora-wrapper-upload-file
@@ -109,12 +62,13 @@ rules:
 
     **Example Attack Vector:**
 
-    ```python\nupload_file(''../../../../etc/passwd'')\n```
+    ```python\n../../etc/passwd\n```
 
 
     **How The Attack Works:**
 
-    The payload traverses the directory structure to access sensitive files.
+    The payload traverses the directory structure and potentially overwrites or reads
+    sensitive files.
 
 
     **Data at Risk (Impact):**
@@ -126,7 +80,7 @@ rules:
     **AI Analysis:**
 
     User-controlled filename is used to construct a file path without proper sanitization.'
-  severity: ERROR
+  severity: WARNING
   languages:
   - python
   metadata:
@@ -135,7 +89,7 @@ rules:
     - python
     source: fixora-ai-analysis
     vulnerability_type: Path Traversal
-    confidence: HIGH
+    confidence: MEDIUM
     wrapper_defined_in: api/files.py
     wraps:
     - os.path.join
