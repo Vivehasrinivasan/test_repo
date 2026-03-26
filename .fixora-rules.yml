@@ -66,7 +66,7 @@ rules:
 
     **How The Attack Works:**
 
-    The payload injects a malicious command that gets executed by the subprocess.
+    The payload injects a malicious command that the subprocess executes.
 
 
     **Data at Risk (Impact):**
@@ -76,7 +76,7 @@ rules:
 
     **AI Analysis:**
 
-    User-controlled data passed to subprocess.run without proper sanitization.'
+    User-controlled data is passed to a command without proper sanitization.'
   severity: ERROR
   languages:
   - python
@@ -114,7 +114,7 @@ rules:
 
     **How The Attack Works:**
 
-    The payload traverses the directory structure and writes to a sensitive file.
+    The payload traverses the directory structure to access sensitive files.
 
 
     **Data at Risk (Impact):**
@@ -125,7 +125,7 @@ rules:
 
     **AI Analysis:**
 
-    User-controlled filename used in file path without proper sanitization.'
+    User-controlled filename is used to construct a file path without proper sanitization.'
   severity: ERROR
   languages:
   - python
