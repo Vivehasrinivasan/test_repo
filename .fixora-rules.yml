@@ -1,0 +1,169 @@
+rules:
+- id: fixora-wrapper-bulk-insert
+  patterns:
+  - pattern-inside: "def bulk_insert(...):\n  ..."
+  - pattern-either:
+    - pattern: cursor.execute(...)
+    - pattern: $OBJ.execute(...)
+    - pattern: execute(...)
+  message: '### SQL Injection via `table`
+
+
+    **Vulnerable Sink:** Passes untrusted data directly to `cursor.execute`.
+
+
+    **Live Exploit Vector:**
+
+    ```python\n// Target Function: bulk_insert()\n// Parameter: table\n\n// Attacker
+    executes:\nbulk_insert(table = users; DROP TABLE users --)\n```
+
+
+    **Outcome:**
+
+    The attacker-controlled table name is concatenated into the SQL INSERT statement,
+    allowing for potential SQL injection.
+
+
+    **Data at Risk (Impact):**
+
+    Attackers can potentially inject malicious SQL, but the risk is reduced due to
+    parameterized query.'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: SQL Injection
+    confidence: MEDIUM
+    wrapper_defined_in: core/database.py
+    wraps:
+    - cursor.execute
+    modules_used:
+    - sqlite3
+    vulnerable_parameter: table
+    malicious_payload: users; DROP TABLE users --
+    exploit_explanation: The attacker-controlled table name is concatenated into the
+      SQL INSERT statement, allowing for potential SQL injection.
+    exploit_injected_example: bulk_insert(table = users; DROP TABLE users --)
+    impact_summary: Attackers can potentially inject malicious SQL, but the risk is
+      reduced due to parameterized query.
+    cwe:
+    - CWE-89
+    owasp:
+    - A03:2021
+- id: fixora-wrapper-execute-background-task
+  patterns:
+  - pattern-inside: "def execute_background_task(...):\n  ..."
+  - pattern-either:
+    - pattern: subprocess.run(...)
+    - pattern: $OBJ.run(...)
+    - pattern: run(...)
+  message: '### Command Injection via `command_str`
+
+
+    **Vulnerable Sink:** Passes untrusted data directly to `subprocess.run`.
+
+
+    **Live Exploit Vector:**
+
+    ```python\n// Target Function: execute_background_task()\n// Parameter: command_str\n\n//
+    Attacker executes:\nexecute_background_task(command_str = ls -l; echo ''Hello
+    World'')\n```
+
+
+    **Outcome:**
+
+    The attacker-controlled command string is split using shlex, reducing the risk
+    of command injection.
+
+
+    **Data at Risk (Impact):**
+
+    Attackers can potentially inject malicious commands, but the risk is low due to
+    safe command execution.'
+  severity: INFO
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Command Injection
+    confidence: LOW
+    wrapper_defined_in: core/system.py
+    wraps:
+    - subprocess.run
+    modules_used:
+    - subprocess
+    vulnerable_parameter: command_str
+    malicious_payload: ls -l; echo 'Hello World'
+    exploit_explanation: The attacker-controlled command string is split using shlex,
+      reducing the risk of command injection.
+    exploit_injected_example: execute_background_task(command_str = ls -l; echo 'Hello
+      World')
+    impact_summary: Attackers can potentially inject malicious commands, but the risk
+      is low due to safe command execution.
+    cwe:
+    - CWE-78
+    owasp:
+    - A03:2021
+- id: fixora-wrapper-upload-file
+  patterns:
+  - pattern-inside: "def upload_file(...):\n  ..."
+  - pattern-either:
+    - pattern: os.path.join(...)
+    - pattern: $OBJ.join(...)
+    - pattern: join(...)
+    - pattern: open(...)
+    - pattern: $OBJ.open(...)
+  message: '### Path Traversal via `file.filename`
+
+
+    **Vulnerable Sink:** Passes untrusted data directly to `os.path.join, open`.
+
+
+    **Live Exploit Vector:**
+
+    ```python\n// Target Function: upload_file()\n// Parameter: file.filename\n\n//
+    Attacker executes:\nupload_file(file.filename = ../../etc/passwd)\n```
+
+
+    **Outcome:**
+
+    The attacker-controlled filename is used to construct the file path, allowing
+    for potential path traversal.
+
+
+    **Data at Risk (Impact):**
+
+    Attackers can potentially write files outside the intended directory.'
+  severity: WARNING
+  languages:
+  - python
+  metadata:
+    category: security
+    technology:
+    - python
+    source: fixora-ai-analysis
+    vulnerability_type: Path Traversal
+    confidence: MEDIUM
+    wrapper_defined_in: api/files.py
+    wraps:
+    - os.path.join
+    - open
+    modules_used:
+    - os
+    vulnerable_parameter: file.filename
+    malicious_payload: ../../etc/passwd
+    exploit_explanation: The attacker-controlled filename is used to construct the
+      file path, allowing for potential path traversal.
+    exploit_injected_example: upload_file(file.filename = ../../etc/passwd)
+    impact_summary: Attackers can potentially write files outside the intended directory.
+    cwe:
+    - CWE-22
+    owasp:
+    - A01:2021
