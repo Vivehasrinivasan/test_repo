@@ -6,35 +6,28 @@ rules:
     - pattern: cursor.execute(...)
     - pattern: $OBJ.execute(...)
     - pattern: execute(...)
-  message: '### Alert: SQL Injection in `bulk_insert()`
+  message: '### SQL Injection via `table`
 
 
-    **Mechanism:**
-
-    This function takes untrusted input and passes it directly into `cursor.execute`
-    without adequate validation or sanitization.
+    **Vulnerable Sink:** Passes untrusted data directly to `cursor.execute`.
 
 
-    **Example Attack Vector:**
+    **Live Exploit Vector:**
 
-    ```python\nbulk_insert(''users; DROP TABLE users; --'', data)\n```
+    ```python\n// Target Function: bulk_insert()\n// Parameter: table\n\n// Attacker
+    executes:\nbulk_insert(table = ''users'' OR 1=1 --)\n```
 
 
-    **How The Attack Works:**
+    **Outcome:**
 
-    The payload closes the intended SQL value and injects a destructive second statement
-    that the sink executes.
+    The attacker-controlled table name is concatenated into the SQL INSERT statement,
+    potentially allowing SQL injection.
 
 
     **Data at Risk (Impact):**
 
-    Can leak the entire database, bypass authentication, or destroy critical records.
-
-
-    **AI Analysis:**
-
-    User input concatenated directly into SQL query.'
-  severity: ERROR
+    Attackers can potentially inject malicious SQL and access unauthorized data.'
+  severity: WARNING
   languages:
   - python
   metadata:
@@ -43,12 +36,19 @@ rules:
     - python
     source: fixora-ai-analysis
     vulnerability_type: SQL Injection
-    confidence: HIGH
+    confidence: MEDIUM
     wrapper_defined_in: core/database.py
     wraps:
     - cursor.execute
     modules_used:
     - sqlite3
+    vulnerable_parameter: table
+    malicious_payload: '''users'' OR 1=1 --'
+    exploit_explanation: The attacker-controlled table name is concatenated into the
+      SQL INSERT statement, potentially allowing SQL injection.
+    exploit_injected_example: bulk_insert(table = 'users' OR 1=1 --)
+    impact_summary: Attackers can potentially inject malicious SQL and access unauthorized
+      data.
     cwe:
     - CWE-89
     owasp:
@@ -60,34 +60,30 @@ rules:
     - pattern: subprocess.run(...)
     - pattern: $OBJ.run(...)
     - pattern: run(...)
-  message: '### Alert: Command Injection in `execute_background_task()`
+  message: '### Command Injection via `command_str`
 
 
-    **Mechanism:**
-
-    This function takes untrusted input and passes it directly into `subprocess.run`
-    without adequate validation or sanitization.
+    **Vulnerable Sink:** Passes untrusted data directly to `subprocess.run`.
 
 
-    **Example Attack Vector:**
+    **Live Exploit Vector:**
 
-    ```python\nexecute_background_task(''ls -l; rm -rf /;'')\n```
+    ```python\n// Target Function: execute_background_task()\n// Parameter: command_str\n\n//
+    Attacker executes:\nexecute_background_task(command_str = ls -l; echo ''Hello
+    World'')\n```
 
 
-    **How The Attack Works:**
+    **Outcome:**
 
-    The payload injects a malicious command that the subprocess module executes.
+    The attacker-controlled command string is passed to subprocess.run, but shlex.split
+    prevents command injection.
 
 
     **Data at Risk (Impact):**
 
-    Allows an attacker to execute arbitrary OS commands, leading to full server compromise.
-
-
-    **AI Analysis:**
-
-    User-controlled data is passed to a shell command without proper sanitization.'
-  severity: ERROR
+    Attackers can potentially inject malicious commands, but the use of shlex.split
+    mitigates this risk.'
+  severity: INFO
   languages:
   - python
   metadata:
@@ -96,12 +92,20 @@ rules:
     - python
     source: fixora-ai-analysis
     vulnerability_type: Command Injection
-    confidence: HIGH
+    confidence: LOW
     wrapper_defined_in: core/system.py
     wraps:
     - subprocess.run
     modules_used:
     - subprocess
+    vulnerable_parameter: command_str
+    malicious_payload: ls -l; echo 'Hello World'
+    exploit_explanation: The attacker-controlled command string is passed to subprocess.run,
+      but shlex.split prevents command injection.
+    exploit_injected_example: execute_background_task(command_str = ls -l; echo 'Hello
+      World')
+    impact_summary: Attackers can potentially inject malicious commands, but the use
+      of shlex.split mitigates this risk.
     cwe:
     - CWE-78
     owasp:
@@ -115,35 +119,28 @@ rules:
     - pattern: join(...)
     - pattern: open(...)
     - pattern: $OBJ.open(...)
-  message: '### Alert: Path Traversal in `upload_file()`
+  message: '### Path Traversal via `file.filename`
 
 
-    **Mechanism:**
-
-    This function takes untrusted input and passes it directly into `os.path.join,
-    open` without adequate validation or sanitization.
+    **Vulnerable Sink:** Passes untrusted data directly to `os.path.join, open`.
 
 
-    **Example Attack Vector:**
+    **Live Exploit Vector:**
 
-    ```python\nupload_file(''../../../../etc/passwd'')\n```
+    ```python\n// Target Function: upload_file()\n// Parameter: file.filename\n\n//
+    Attacker executes:\nupload_file(file.filename = ../../etc/passwd)\n```
 
 
-    **How The Attack Works:**
+    **Outcome:**
 
-    The payload traverses the directory structure and writes to a sensitive file.
+    The attacker-controlled filename is used to construct the file path, potentially
+    allowing path traversal.
 
 
     **Data at Risk (Impact):**
 
-    Can leak sensitive server files (e.g., /etc/passwd, .env) and application source
-    code.
-
-
-    **AI Analysis:**
-
-    User-controlled filename is used to construct a file path without proper sanitization.'
-  severity: ERROR
+    Attackers can potentially access unauthorized files and directories.'
+  severity: WARNING
   languages:
   - python
   metadata:
@@ -152,13 +149,19 @@ rules:
     - python
     source: fixora-ai-analysis
     vulnerability_type: Path Traversal
-    confidence: HIGH
+    confidence: MEDIUM
     wrapper_defined_in: api/files.py
     wraps:
     - os.path.join
     - open
     modules_used:
     - os
+    vulnerable_parameter: file.filename
+    malicious_payload: ../../etc/passwd
+    exploit_explanation: The attacker-controlled filename is used to construct the
+      file path, potentially allowing path traversal.
+    exploit_injected_example: upload_file(file.filename = ../../etc/passwd)
+    impact_summary: Attackers can potentially access unauthorized files and directories.
     cwe:
     - CWE-22
     owasp:
